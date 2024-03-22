@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Time Products</title>
+</head>
+<body>
+    <h1>Lista de Productos (Tiempo real)</h1>
+    <ul id="productList"></ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('productAdded', function(product) {
+            const productList = document.getElementById('productList');
+            const li = document.createElement('li');
+            li.textContent = `${product.title} - ${product.description}`;
+            productList.appendChild(li);
+        });
+
+        socket.on('productDeleted', function(productId) {
+            const productList = document.getElementById('productList');
+            const liToRemove = productList.querySelector(`[data-id="${productId}"]`);
+            liToRemove.remove();
+        });
+    </script>
+</body>
+</html>
