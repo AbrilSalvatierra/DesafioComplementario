@@ -40,8 +40,6 @@ cartRouter.post('/:cid/product/:pid', async (req, res) => {
             return;
         }
 
-        // Aquí deberías agregar lógica para agregar el producto al carrito
-
         res.status(200).json({ message: 'Product added to cart successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });

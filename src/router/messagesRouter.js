@@ -14,7 +14,7 @@ messagesRouter.get('/', async (req, res) => {
 });
 
 // Agregar un nuevo mensaje
-messagesRouter.post('/newMessage', async (req, res) => {
+messagesRouter.post('/', async (req, res) => {
     try {
         const { user, text } = req.body;
         const newMessage = new Message({ user, text });
