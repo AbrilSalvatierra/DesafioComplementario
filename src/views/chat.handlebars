@@ -6,6 +6,7 @@
             <button>Send</button>
         </form>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         const form = document.getElementById('form');
@@ -26,4 +27,4 @@
             window.scrollTo(0, document.body.scrollHeight);
         });
     </script>
-    <script src="/socket.io/socket.io.js"></script>
+    
