@@ -1,29 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real Time Products</title>
-</head>
-<body>
-    <h1>Lista de Productos (Tiempo real)</h1>
-    <ul id="productList"></ul>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
+<h1>Lista de Productos</h1>
+<h5>Tiempo real</h5>
+<div class="product-grid">
+    {{#each products}}
+        <div class="product-card">
+            <h3>{{this.title}}</h3>
+            <p>{{this.description}}</p>
+            <p>Precio: $ {{this.price}}</p>
+        </div>
+    {{/each}}
+</div>
+<style>
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
 
-        socket.on('productAdded', function(product) {
-            const productList = document.getElementById('productList');
-            const li = document.createElement('li');
-            li.textContent = `${product.title} - ${product.description}`;
-            productList.appendChild(li);
-        });
-
-        socket.on('productDeleted', function(productId) {
-            const productList = document.getElementById('productList');
-            const liToRemove = productList.querySelector(`[data-id="${productId}"]`);
-            liToRemove.remove();
-        });
-    </script>
-</body>
-</html>
+    .product-card {
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+</style>

@@ -19,10 +19,10 @@ const cartSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    product: {
+    products: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Products'
-    },
+    }],
 });
 
 const Cart = mongoose.model("Cart", cartSchema);

@@ -1,0 +1,16 @@
+<h1>Cart</h1>
+    <ul>
+        {{#each cart.products}}
+            <li>
+                <h2>{{this.title}}</h2>
+                <p>{{this.description}}</p>
+                <p>Price: ${{this.price}}</p>
+                <form action="/carts/{{../cart._id}}/product/{{this._id}}" method="POST">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" value="{{this.quantity}}" min="1">
+                    <button type="submit">Update Quantity</button>
+                    <button type="submit" formaction="/carts/{{../cart._id}}/product/{{this._id}}?_method=DELETE">Remove from Cart</button>
+                </form>
+            </li>
+        {{/each}}
+    </ul>

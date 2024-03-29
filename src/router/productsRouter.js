@@ -1,25 +1,57 @@
 import express from 'express';
-import Products from '../dao/models/productsModel.js';
+import Product from '../dao/models/productsModel.js';
+import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const productsRouter = express.Router();
 
-// Obtener todos los productos
+Product.paginate = mongoosePaginate;
+
 productsRouter.get('/', async (req, res) => {
     try {
-        const products = await Products.find();
-        res.json(products);
+        const { 
+            limit = 10, 
+            page = 1, 
+            sort = 'createdAt', 
+            query = {} 
+        } = req.query;
+        const skip = (page - 1) * limit;
+
+        const totalProducts = await Product.countDocuments(query);
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        if (page > totalPages) {
+            res.status(404).json({ error: 'Página no encontrada' });
+            return;
+        }
+
+        const products = await Product.find(query)
+            .sort(sort)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const response = {
+            products,
+            pagination: {
+                totalProducts,
+                totalPages,
+                currentPage: parseInt(page)
+            }
+        };
+
+        res.json(response);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Obtener un producto por su ID
+// Obtener un producto por ID
 productsRouter.get('/:id', async (req, res) => {
     try {
         const productId = req.params.id;
-        const product = await Products.findById(productId);
+        const product = await Product.findById(productId);
         if (!product) {
-            res.status(404).json({ error: 'Product not found' });
+            res.status(404).json({ error: 'Producto no encontrado' });
             return;
         }
         res.json(product);
@@ -31,7 +63,7 @@ productsRouter.get('/:id', async (req, res) => {
 // Agregar un nuevo producto
 productsRouter.post('/', async (req, res) => {
     try {
-        const newProduct = new Products(req.body);
+        const newProduct = new Product(req.body);
         await newProduct.save();
         res.status(201).json(newProduct);
     } catch (error) {
@@ -43,7 +75,7 @@ productsRouter.post('/', async (req, res) => {
 productsRouter.put('/:id', async (req, res) => {
     try {
         const productId = req.params.id;
-        await Products.findByIdAndUpdate(productId, req.body);
+        await Product.findByIdAndUpdate(productId, req.body);
         res.sendStatus(204);
     } catch (error) {
         res.status(404).json({ error: error.message });
@@ -54,12 +86,11 @@ productsRouter.put('/:id', async (req, res) => {
 productsRouter.delete('/:id', async (req, res) => {
     try {
         const productId = req.params.id;
-        await Products.findByIdAndDelete(productId);
+        await Product.findByIdAndDelete(productId);
         res.sendStatus(204);
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
 });
-
 
 export default productsRouter;
