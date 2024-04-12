@@ -1,5 +1,4 @@
 import express from 'express';
-//import bcrypt from 'bcrypt';
 import User from '../dao/models/userModel.js';
 
 const authRouter = express.Router();
@@ -7,8 +6,7 @@ const authRouter = express.Router();
 authRouter.post('/register', async (req, res) => {
   try {
     const { first_name, last_name, email, age, password } = req.body;
-    //const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ first_name, last_name, email, age, password: hashedPassword });
+    const newUser = new User({ first_name, last_name, email, age, password });
     await newUser.save();
     res.status(201).send('Usuario registrado correctamente');
   } catch (error) {
@@ -23,8 +21,7 @@ authRouter.post('/login', async (req, res) => {
     if (!user) {
       return res.status(404).send('Usuario no encontrado');
     }
-    //const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
+    if (password !== user.password) {
       return res.status(401).send('Contraseña incorrecta');
     }
 
