@@ -7,6 +7,8 @@ import path from "path";
 import router from "./routes.js";
 import __dirname from "./utils.js";
 import Product from "./dao/models/productsModel.js";
+import session from 'express-session';
+import authRouter from './router/authRouter.js';
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -25,20 +27,45 @@ app.engine("handlebars", handlebars.engine());
 app.set("view engine", "handlebars");
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/", router);
+app.use(session({
+  secret: 'mySecretKey',
+  resave: false,
+  saveUninitialized: false
+}));
+app.use("/auth", authRouter);
 
-app.get("/", async(req, res) => {
-  res.render("home");
+app.use((req, res, next) => {
+  const allowedPaths = ['/auth/login', '/auth/register']; // Rutas permitidas sin sesión
+  if (allowedPaths.includes(req.path) || req.session.user) {
+    next();
+  } else {
+    res.redirect('/auth/login');
+  }
 });
 
-app.get("/realtimeproducts", async (req, res) => {
-  try {
-    const products = await Product.find(); 
-    //console.log(products); 
-    res.render("realTimeProducts", { products: products });
-  } catch (error) {
-    console.error("Error al obtener productos:", error);
-    res.status(500).send("Error interno del servidor");
+app.get("/admin/products", async (req, res) => {
+  res.render("adminProducts");
+});
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect('/auth/login');
+});
+
+app.use((req, res, next) => {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect('/auth/login');
   }
+});
+
+app.get("/", async(req, res) => {
+  res.redirect('/auth/login');
+});
+
+
+app.get("/realtimeproducts", async (req, res) => {
+    res.render("realTimeProducts");
 });
 
 app.get("/chat", (req, res) => {

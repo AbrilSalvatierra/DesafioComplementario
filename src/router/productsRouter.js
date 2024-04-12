@@ -45,6 +45,17 @@ productsRouter.get('/', async (req, res) => {
     }
 });
 
+productsRouter.get('/realtimeproducts', async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.render('realTimeProducts', { products });
+    } catch (error) {
+        console.error('Error al obtener productos:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+
 // Obtener un producto por ID
 productsRouter.get('/:id', async (req, res) => {
     try {

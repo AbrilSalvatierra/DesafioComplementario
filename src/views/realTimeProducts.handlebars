@@ -1,4 +1,8 @@
-<h1>Lista de Productos</h1>
+{{#if user}}
+  <h1>Bienvenido, {{user.email}} (Rol: {{user.role}})</h1>
+{{/if}}
+
+<h2>Lista de Productos</h2>
 <h5>Tiempo real</h5>
 <div class="product-grid">
     {{#each products}}
@@ -7,6 +11,8 @@
             <p>{{this.description}}</p>
             <p>Precio: $ {{this.price}}</p>
         </div>
+    {{else}}
+        <p>No se encontraron productos.</p>
     {{/each}}
 </div>
 <style>
