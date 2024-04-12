@@ -2,7 +2,7 @@ import express from "express";
 import handlebars from "express-handlebars";
 import http from "http";
 import { Server } from "socket.io";
-import __dirname from ""
+import __dirname from "./utils.js"
 import mongoose from "mongoose";
 import path from "path";
 import router from "./routes.js";
@@ -16,7 +16,7 @@ const httpServer = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("views", path.join(__dirname, "views"));
-app.engine("handlebars", handlebars());
+app.engine("handlebars", handlebars.engine());
 app.set("view engine", "handlebars");
 
 // Conexión a MongoDB
