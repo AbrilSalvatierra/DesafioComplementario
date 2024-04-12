@@ -86,8 +86,8 @@ productsRouter.post('/', async (req, res) => {
 productsRouter.put('/:id', async (req, res) => {
     try {
         const productId = req.params.id;
-        await Product.findByIdAndUpdate(productId, req.body);
-        res.sendStatus(204);
+        const updatedProduct = await Product.findByIdAndUpdate(productId, req.body, { new: true });
+        res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
     } catch (error) {
         res.status(404).json({ error: error.message });
     }

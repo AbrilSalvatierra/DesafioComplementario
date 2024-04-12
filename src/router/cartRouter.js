@@ -30,23 +30,31 @@ cartRouter.get('/:cid', async (req, res) => {
 });
 
 // Agregar un producto a un carrito
-cartRouter.post('/:cid/product/:pid', async (req, res) => {
+cartRouter.post('/', async (req, res) => {
+    try {
+        const newCart = new Cart(req.body);
+        await newCart.save();
+        res.status(201).json(newCart);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+cartRouter.post("/:cid/product/:pid", async (req, res) => {
     try {
         const cartId = req.params.cid;
         const productId = req.params.pid;
-
         const cart = await Cart.findById(cartId);
         const product = await Product.findById(productId);
 
         if (!cart || !product) {
-            res.status(404).json({ error: 'Cart or Product not found' });
+            res.status(404).json({ error: "Cart or Product not found" });
             return;
         }
 
-        cart.product.push(product);
+        cart.products.push(product); // Corregido a cart.products
         await cart.save();
-
-        res.status(200).json({ message: 'Product added to cart successfully' });
+        res.status(200).json({ message: "Product added to cart successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -98,6 +106,35 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
         await cart.save();
 
         res.status(200).json({ message: 'Product quantity updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Agregar múltiples productos al carrito
+cartRouter.put("/:cid/products", async (req, res) => {
+    try {
+        const cartId = req.params.cid;
+        const productIds = req.body.productIds;
+
+        const cart = await Cart.findById(cartId);
+        if (!cart) {
+            res.status(404).json({ error: "Cart not found" });
+            return;
+        }
+
+        // Agregar productos al carrito
+        for (const productId of productIds) {
+            const product = await Product.findById(productId);
+            if (!product) {
+                console.error(`Product with ID ${productId} not found`);
+                continue;
+            }
+            cart.products.push(product);
+        }
+
+        await cart.save();
+        res.status(200).json({ message: "Products added to cart successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
